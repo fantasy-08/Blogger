@@ -51,7 +51,6 @@ class UpdateAccountForm(FlaskForm):
             user=User.query.filter_by(username=username.data).first()
 
             if user:
-                print('No username')
                 raise ValidationError('Username taken try something else')
 
     def validate_email(self,email):
@@ -59,10 +58,25 @@ class UpdateAccountForm(FlaskForm):
             user=User.query.filter_by(email=email.data).first()
 
             if user:
-                print('No email')
                 raise ValidationError('Email taken try something else')
          
 class PostForm(FlaskForm):
     title=StringField('Title',validators=[DataRequired()])
     content=TextAreaField('Content',validators=[DataRequired()])
     submit=SubmitField('Blog It!')
+
+class RequestResetForm(FlaskForm):
+    email = StringField('Email',
+                        validators=[DataRequired(), Email()])
+    def validate_email(self,email):
+        user=User.query.filter_by(email=email.data).first()
+        if not user:
+            raise ValidationError("Email doesn't exist")
+    
+    submit=SubmitField('Send OTP on mail!')
+
+class ResetPasswoardForm(FlaskForm):
+    password = PasswordField('Password', validators=[DataRequired()])
+    confirm_password = PasswordField('Confirm Password',
+                                     validators=[DataRequired(), EqualTo('password')])
+    submit = SubmitField('Change')
